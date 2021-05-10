@@ -11,7 +11,8 @@ import {
   Icon,
   Input,
   Image,
-  Loader
+  Loader,
+  Rating
 } from 'semantic-ui-react'
 
 import { createTodo, deleteTodo, getTodos, patchTodo } from '../api/todos-api'
@@ -71,17 +72,32 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
     }
   }
 
-  onTodoCheck = async (pos: number) => {
+  onTodoCheck = async (pos: number, isImportant: boolean = false) => {
     try {
       const todo = this.state.todos[pos]
+      let updateValues
+      let posValue
+      if (isImportant) {
+        updateValues = {
+          done: todo.done,
+          important: !todo.important
+        }
+        posValue = { important: { $set: !todo.important } }
+      } else {
+        updateValues = {
+          done: !todo.done,
+          important: todo.important
+        }
+        posValue = { done: { $set: !todo.done } }
+      }
       await patchTodo(this.props.auth.getIdToken(), todo.todoId, {
         name: todo.name,
         dueDate: todo.dueDate,
-        done: !todo.done
+        ...updateValues
       })
       this.setState({
         todos: update(this.state.todos, {
-          [pos]: { done: { $set: !todo.done } }
+          [pos]: posValue
         })
       })
     } catch {
@@ -156,6 +172,18 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
     )
   }
 
+  renderName(todo: Todo) {
+    if (!todo.done)
+      return (
+        <p>{todo.name}</p>
+      )
+    else {
+      return (
+        <p><s>{todo.name}</s></p>
+      )
+    }
+  }
+
   renderTodosList() {
     return (
       <Grid padded>
@@ -168,11 +196,19 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
                   checked={todo.done}
                 />
               </Grid.Column>
-              <Grid.Column width={10} verticalAlign="middle">
-                {todo.name}
+              <Grid.Column width={9} verticalAlign="middle">
+                {this.renderName(todo)}
               </Grid.Column>
               <Grid.Column width={3} floated="right">
-                {todo.dueDate}
+                <p>Due: {todo.dueDate}</p>
+
+              </Grid.Column>
+              <Grid.Column width={1} floated="right">
+                <Rating
+                  icon="star"
+                  onRate={() => this.onTodoCheck(pos, true)}
+                  rating={todo.important ? 1 : 0}
+                />
               </Grid.Column>
               <Grid.Column width={1} floated="right">
                 <Button

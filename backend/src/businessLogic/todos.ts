@@ -22,6 +22,7 @@ export async function createTodo(userId: string, newTodo: CreateTodoRequest) {
         todoId,
         createdAt,
         done: false,
+        important: false,
         ...newTodo
     })
 
@@ -45,14 +46,16 @@ export async function updateTodo(updatedTodo: UpdateTodoRequest, todoId: string,
             "userId": userId,
             "todoId": todoId
         },
-        UpdateExpression: "set #n = :name, dueDate = :dueDate, done = :done",
+        UpdateExpression: "set #n = :name, dueDate = :dueDate, done = :done, #i = :important",
         ExpressionAttributeNames: {
-            "#n": "name"
+            "#n": "name",
+            "#i": "important"
         },
         ExpressionAttributeValues: {
             ":name": updatedTodo.name,
             ":dueDate": updatedTodo.dueDate,
-            ":done": updatedTodo.done
+            ":done": updatedTodo.done,
+            ":important": updatedTodo.important
         }
     };
     return await todosAccess.updateTodo(params)
