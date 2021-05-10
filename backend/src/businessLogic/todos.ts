@@ -5,6 +5,7 @@ import { TodoAccess } from '../dataLayer/todosAccess'
 import { CreateTodoRequest } from '../requests/CreateTodoRequest'
 import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
 import { TodoUpdateParams } from '../models/TodoUpdateParam'
+import { paramsDeleteDueDate, paramsDoneOrImportant, paramsUpdateDueDate } from './updateQueries'
 
 
 const todosAccess = new TodoAccess()
@@ -41,31 +42,18 @@ export async function deleteTodo(todoId: string, userId: string) {
 }
 
 export async function updateTodo(updatedTodo: UpdateTodoRequest, todoId: string, userId: string) {
+    let params: TodoUpdateParams;
 
-    let updateExpression: string = "set #n = :name, done = :done, #i = :important"
-    let expressionAttributeValues = {
-        ":name": updatedTodo.name,
-        ":done": updatedTodo.done,
-        ":important": updatedTodo.important
+    if (updatedTodo.dueDate && updatedTodo.dueDate != "delete") {
+        params = paramsUpdateDueDate(updatedTodo, userId, todoId);
+    }
+    else if (updatedTodo.dueDate && updatedTodo.dueDate == "delete") {
+        params = paramsDeleteDueDate(userId, todoId)
+    }
+    else {
+        params = paramsDoneOrImportant(updatedTodo, userId, todoId)
     }
 
-    if (updatedTodo.dueDate) {
-        updateExpression = "set #n = :name, dueDate = :dueDate, done = :done, #i = :important"
-        expressionAttributeValues[":dueDate"] = updatedTodo.dueDate
-    }
-
-    const params: TodoUpdateParams = {
-        Key: {
-            "userId": userId,
-            "todoId": todoId
-        },
-        UpdateExpression: updateExpression,
-        ExpressionAttributeNames: {
-            "#n": "name",
-            "#i": "important"
-        },
-        ExpressionAttributeValues: expressionAttributeValues
-    };
     return await todosAccess.updateTodo(params)
 }
 

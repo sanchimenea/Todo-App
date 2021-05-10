@@ -91,7 +91,7 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
         }
         posValue = { done: { $set: !todo.done } }
       }
-      if (isDueDate != -1) {
+      if (isDueDate >= 0) {
         const newDueDate = this.calculateDueDate(isDueDate)
         updateValues = {
           done: todo.done,
@@ -99,6 +99,13 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
           dueDate: newDueDate
         }
         posValue = { dueDate: { $set: newDueDate } }
+      } else if (isDueDate == -2) {
+        updateValues = {
+          done: todo.done,
+          important: todo.important,
+          dueDate: "delete"
+        }
+        posValue = { dueDate: { $set: "" } }
       }
       await patchTodo(this.props.auth.getIdToken(), todo.todoId, {
         name: todo.name,
@@ -218,23 +225,37 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
     let text = "Due: " + todo.dueDate
     if (!todo.dueDate) {
       text = '+ Add due date'
+      return (
+        <Container>
+          <Icon name="calendar alternate outline" color="blue" />
+          <Dropdown
+            text={text}
+          >
+            <Dropdown.Menu>
+              <Dropdown.Item icon='circle' text='Today' onClick={() => this.onTodoCheck(pos, false, 0)}></Dropdown.Item>
+              <Dropdown.Item icon='chevron right' text='Tomorrow' onClick={() => this.onTodoCheck(pos, false, 1)}></Dropdown.Item>
+              <Dropdown.Item icon='angle double right' text='Next Week' onClick={() => this.onTodoCheck(pos, false, 7)}></Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        </Container>
+      )
+    } else {
+      return (
+        <Container>
+          <Icon name="calendar alternate outline" color="blue" />
+          <Dropdown
+            text={text}
+          >
+            <Dropdown.Menu>
+              <Dropdown.Item icon='circle' text='Today' onClick={() => this.onTodoCheck(pos, false, 0)}></Dropdown.Item>
+              <Dropdown.Item icon='chevron right' text='Tomorrow' onClick={() => this.onTodoCheck(pos, false, 1)}></Dropdown.Item>
+              <Dropdown.Item icon='angle double right' text='Next Week' onClick={() => this.onTodoCheck(pos, false, 7)}></Dropdown.Item>
+              <Dropdown.Item icon='delete calendar' text='Delete due date' onClick={() => this.onTodoCheck(pos, false, -2)}></Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        </Container>
+      )
     }
-    return (
-      <Container>
-        <Icon name="calendar alternate outline" color="blue" />
-        <Dropdown
-          text={text}
-        >
-          <Dropdown.Menu>
-            <Dropdown.Item icon='circle' text='Today' onClick={() => this.onTodoCheck(pos, false, 0)}></Dropdown.Item>
-            <Dropdown.Item icon='chevron right' text='Tomorrow' onClick={() => this.onTodoCheck(pos, false, 1)}></Dropdown.Item>
-            <Dropdown.Item icon='angle double right' text='Next Week' onClick={() => this.onTodoCheck(pos, false, 7)}></Dropdown.Item>
-            <Dropdown.Item icon='delete calendar' text='Delete due date'></Dropdown.Item>
-          </Dropdown.Menu>
-        </Dropdown>
-      </Container>
-    )
-
   }
 
   renderTodosList() {
@@ -268,7 +289,7 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
                   color="blue"
                   onClick={() => this.onEditButtonClick(todo.todoId)}
                 >
-                  <Icon name="pencil" />
+                  <Icon name="attach" />
                 </Button>
               </Grid.Column>
               <Grid.Column width={1} floated="right" verticalAlign="middle">
