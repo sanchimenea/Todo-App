@@ -18,6 +18,8 @@ provider:
   environment:
     TODOS_TABLE: TODOS-${self:provider.stage}
     INDEX_NAME: CreatedAtIndex
+    ATTACH_TABLE: TODOS-ATTACH-${self:provider.stage}
+    INDEX_ATTACH_NAME: AttachNameIndex
     TODOS_S3_BUCKET: serverless-todos-1-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
 
@@ -100,10 +102,16 @@ functions:
           path: todos/{todoId}/attachment
           cors: true
           authorizer: Auth
+          request:
+            schemas:
+              application/json: ${file(src/models/create-attach-request.json)}
     iamRoleStatements:
       - Effect: "Allow"
         Action: 
-          - dynamodb:UpdateItem
+          - dynamodb:PutItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.ATTACH_TABLE}
+      - Effect: "Allow"
+        Action: 
           - dynamodb:GetItem 
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
       - Effect: "Allow"
@@ -148,6 +156,33 @@ resources:
               - AttributeName: userId
                 KeyType: HASH
               - AttributeName: createdAt
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL # What attributes will be copied to an index
+
+    TodosAttachTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: todoId
+            AttributeType: S
+          - AttributeName: attachId
+            AttributeType: S
+          - AttributeName: attachName
+            AttributeType: S
+        KeySchema:
+          - AttributeName: todoId
+            KeyType: HASH
+          - AttributeName: attachId
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:provider.environment.ATTACH_TABLE}
+        LocalSecondaryIndexes:
+          - IndexName: ${self:provider.environment.INDEX_ATTACH_NAME}
+            KeySchema:
+              - AttributeName: todoId
+                KeyType: HASH
+              - AttributeName: attachName
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL # What attributes will be copied to an index

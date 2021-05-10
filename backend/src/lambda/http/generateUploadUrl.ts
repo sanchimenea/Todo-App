@@ -1,10 +1,13 @@
 import 'source-map-support/register'
 import { APIGatewayProxyEvent, APIGatewayProxyResult, APIGatewayProxyHandler } from 'aws-lambda'
+import * as uuid from 'uuid'
 
 import { createLogger } from '../../utils/logger'
 import { getUserId } from '../utils'
 import { addUrlTodo, todoExists } from '../../businessLogic/todos'
 import { getUploadUrl } from '../../dataLayer/bucketAccess'
+import { CreateAttachRequest } from '../../requests/CreateAttachRequest'
+
 
 const bucketName = process.env.TODOS_S3_BUCKET
 const logger = createLogger('generateUploadURL')
@@ -28,11 +31,16 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
     }
   }
 
-  const signedUrl = getUploadUrl(todoId)
-  const attachmentUrl = `https://${bucketName}.s3.amazonaws.com/${todoId}`
-  await addUrlTodo(todoId, userId, attachmentUrl)
+  const newAttach: CreateAttachRequest = JSON.parse(event.body)
 
-  logger.info('Added attachment with URL: ' + attachmentUrl)
+
+  const attachId = getAttachId(newAttach)
+  const signedUrl = getUploadUrl(attachId)
+  const bucketURL = `https://${bucketName}.s3.amazonaws.com/`
+
+  await addUrlTodo(todoId, attachId, bucketURL, newAttach)
+
+  // logger.info('Added attachment with URL: ' + attachmentUrl)
 
   return {
     statusCode: 201,
@@ -46,6 +54,14 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
   }
 }
 
+
+function getAttachId(newAttach: CreateAttachRequest) {
+  let attachId = uuid.v4()
+  if (newAttach.name.split('.').length > 1) {
+    attachId = attachId + "." + newAttach.name.split('.').pop()
+  }
+  return attachId
+}
 
 
 

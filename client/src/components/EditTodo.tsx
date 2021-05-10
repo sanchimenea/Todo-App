@@ -35,7 +35,7 @@ export class EditTodo extends React.PureComponent<
   handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
     if (!files) return
-
+    // console.log(files[0])
     this.setState({
       file: files[0]
     })
@@ -51,7 +51,7 @@ export class EditTodo extends React.PureComponent<
       }
 
       this.setUploadState(UploadState.FetchingPresignedUrl)
-      const uploadUrl = await getUploadUrl(this.props.auth.getIdToken(), this.props.match.params.todoId)
+      const uploadUrl = await getUploadUrl(this.props.auth.getIdToken(), this.props.match.params.todoId, this.state.file)
 
       this.setUploadState(UploadState.UploadingFile)
       await uploadFile(uploadUrl, this.state.file)
@@ -81,7 +81,7 @@ export class EditTodo extends React.PureComponent<
             <input
               type="file"
               accept="image/*"
-              placeholder="Image to upload"
+              placeholder="File to upload"
               onChange={this.handleFileChange}
             />
           </Form.Field>

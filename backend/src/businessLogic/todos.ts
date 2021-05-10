@@ -6,6 +6,8 @@ import { CreateTodoRequest } from '../requests/CreateTodoRequest'
 import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
 import { TodoUpdateParams } from '../models/TodoUpdateParam'
 import { paramsDeleteDueDate, paramsDoneOrImportant, paramsUpdateDueDate } from './updateQueries'
+import { CreateAttachRequest } from '../requests/CreateAttachRequest'
+import { URL } from 'url'
 
 
 const todosAccess = new TodoAccess()
@@ -57,17 +59,16 @@ export async function updateTodo(updatedTodo: UpdateTodoRequest, todoId: string,
     return await todosAccess.updateTodo(params)
 }
 
-export async function addUrlTodo(todoId: string, userId: string, attachmentUrl: string) {
-    const params: TodoUpdateParams = {
-        Key: {
-            "userId": userId,
-            "todoId": todoId
-        },
-        UpdateExpression: "set attachmentUrl = :attachmentUrl",
-        ExpressionAttributeValues: {
-            ":attachmentUrl": attachmentUrl
-        }
-    };
+export async function addUrlTodo(todoId: string, attachId: string, bucketURL: string, newAttach: CreateAttachRequest) {
+    // Add attachment URL to Attachment's Table 1:M todoId:attachId
 
-    return await todosAccess.updateTodo(params)
+    const attachmentUrl = new URL(attachId, bucketURL)
+    const newItem = await todosAccess.createAttach({
+        todoId,
+        attachId,
+        attachmentUrl: attachmentUrl.toString(),
+        ...newAttach
+    })
+
+    return newItem
 }

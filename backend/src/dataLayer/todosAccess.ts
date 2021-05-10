@@ -2,6 +2,7 @@ import * as AWS from 'aws-sdk'
 import { DocumentClient } from 'aws-sdk/clients/dynamodb'
 
 import { TodoItem } from '../models/TodoItem'
+import { AttachItem } from '../models/AttachItem'
 import { TodoUpdateParams } from '../models/TodoUpdateParam'
 import { createLogger } from '../utils/logger'
 
@@ -12,7 +13,8 @@ export class TodoAccess {
 
     constructor(
         private readonly docClient: DocumentClient = new AWS.DynamoDB.DocumentClient(),
-        private readonly todosTable = process.env.TODOS_TABLE
+        private readonly todosTable = process.env.TODOS_TABLE,
+        private readonly attachTable = process.env.ATTACH_TABLE
     ) { }
 
     async getTodosByUser(userId: string): Promise<TodoItem[]> {
@@ -79,6 +81,15 @@ export class TodoAccess {
                 else logger.info("Success " + data)
             }).promise()
 
+    }
+
+    async createAttach(newItem: AttachItem): Promise<AttachItem> {
+        await this.docClient.put({
+            TableName: this.attachTable,
+            Item: newItem
+        }).promise()
+
+        return newItem
     }
 
 }
