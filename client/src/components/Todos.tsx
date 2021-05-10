@@ -49,10 +49,8 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
 
   onTodoCreate = async (event: React.ChangeEvent<HTMLButtonElement>) => {
     try {
-      const dueDate = this.calculateDueDate()
       const newTodo = await createTodo(this.props.auth.getIdToken(), {
         name: this.state.newTodoName,
-        dueDate
       })
       this.setState({
         todos: [...this.state.todos, newTodo],
@@ -94,7 +92,6 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
       }
       await patchTodo(this.props.auth.getIdToken(), todo.todoId, {
         name: todo.name,
-        dueDate: todo.dueDate,
         ...updateValues
       })
       this.setState({
@@ -207,6 +204,18 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
     }
   }
 
+  renderDueDate(todo: Todo) {
+    if (todo.dueDate) {
+      return (
+        <p><Icon name="calendar alternate outline" /> Due: {todo.dueDate}</p>
+      )
+    } else {
+      return (
+        <p></p>
+      )
+    }
+  }
+
   renderTodosList() {
     return (
       <Grid padded>
@@ -223,7 +232,7 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
                 {this.renderName(todo)}
               </Grid.Column>
               <Grid.Column width={3} floated="right" verticalAlign="middle">
-                <p>Due: {todo.dueDate}</p>
+                {this.renderDueDate(todo)}
               </Grid.Column>
               <Grid.Column width={1} floated="right" verticalAlign="middle">
                 <Rating
@@ -263,10 +272,10 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
     )
   }
 
-  calculateDueDate(): string {
-    const date = new Date()
-    date.setDate(date.getDate() + 7)
+  // calculateDueDate(): string {
+  //   const date = new Date()
+  //   date.setDate(date.getDate() + 7)
 
-    return dateFormat(date, 'yyyy-mm-dd') as string
-  }
+  //   return dateFormat(date, 'yyyy-mm-dd') as string
+  // }
 }

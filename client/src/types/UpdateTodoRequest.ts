@@ -1,6 +1,6 @@
 export interface UpdateTodoRequest {
   name: string
-  dueDate: string
+  dueDate?: string
   done: boolean
   important: boolean
 }

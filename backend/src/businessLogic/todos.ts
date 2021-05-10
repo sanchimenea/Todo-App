@@ -1,5 +1,5 @@
 import * as uuid from 'uuid'
-
+import dateFormat from 'dateformat'
 import { TodoItem } from '../models/TodoItem'
 import { TodoAccess } from '../dataLayer/todosAccess'
 import { CreateTodoRequest } from '../requests/CreateTodoRequest'
@@ -15,7 +15,7 @@ export async function getTodosByUser(userId: string): Promise<TodoItem[]> {
 
 export async function createTodo(userId: string, newTodo: CreateTodoRequest) {
     const todoId = uuid.v4()
-    const createdAt = new Date().toISOString()
+    const createdAt = dateFormat(new Date(), 'yyyy-mm-dd') as string
 
     const newItem = await todosAccess.createTodo({
         userId,
@@ -41,22 +41,30 @@ export async function deleteTodo(todoId: string, userId: string) {
 }
 
 export async function updateTodo(updatedTodo: UpdateTodoRequest, todoId: string, userId: string) {
+
+    let updateExpression: string = "set #n = :name, done = :done, #i = :important"
+    let expressionAttributeValues = {
+        ":name": updatedTodo.name,
+        ":done": updatedTodo.done,
+        ":important": updatedTodo.important
+    }
+
+    if (updatedTodo.dueDate) {
+        updateExpression = "set #n = :name, dueDate = :dueDate, done = :done, #i = :important"
+        expressionAttributeValues[":dueDate"] = updatedTodo.dueDate
+    }
+
     const params: TodoUpdateParams = {
         Key: {
             "userId": userId,
             "todoId": todoId
         },
-        UpdateExpression: "set #n = :name, dueDate = :dueDate, done = :done, #i = :important",
+        UpdateExpression: updateExpression,
         ExpressionAttributeNames: {
             "#n": "name",
             "#i": "important"
         },
-        ExpressionAttributeValues: {
-            ":name": updatedTodo.name,
-            ":dueDate": updatedTodo.dueDate,
-            ":done": updatedTodo.done,
-            ":important": updatedTodo.important
-        }
+        ExpressionAttributeValues: expressionAttributeValues
     };
     return await todosAccess.updateTodo(params)
 }
