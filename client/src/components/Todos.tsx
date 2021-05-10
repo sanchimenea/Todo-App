@@ -12,7 +12,9 @@ import {
   Input,
   Image,
   Loader,
-  Rating
+  Rating,
+  GridRow,
+  Dropdown
 } from 'semantic-ui-react'
 
 import { createTodo, deleteTodo, getTodos, patchTodo } from '../api/todos-api'
@@ -131,26 +133,47 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
 
   renderCreateTodoInput() {
     return (
-      <Grid.Row>
-        <Grid.Column width={16}>
-          <Input
-            action={{
-              color: 'teal',
-              labelPosition: 'left',
-              icon: 'add',
-              content: 'New task',
-              onClick: this.onTodoCreate
-            }}
-            fluid
-            actionPosition="left"
-            placeholder="To change the world..."
-            onChange={this.handleNameChange}
-          />
-        </Grid.Column>
-        <Grid.Column width={16}>
-          <Divider />
-        </Grid.Column>
-      </Grid.Row>
+      <Grid>
+        <Grid.Row>
+          <Grid.Column width={16}>
+            <Input
+              action={{
+                color: 'teal',
+                labelPosition: 'left',
+                icon: 'add',
+                content: 'New task',
+                onClick: this.onTodoCreate
+              }}
+              fluid
+              actionPosition="left"
+              value={this.state.newTodoName}
+              placeholder="To change the world..."
+              onChange={this.handleNameChange}
+            />
+          </Grid.Column>
+        </Grid.Row>
+        <Grid.Row>
+          <Grid.Column width={16} textAlign="right">
+            <Dropdown
+              text='Sort TODOs'
+              icon='filter'
+              floating
+              labeled
+              button
+              className='icon'
+            >
+              <Dropdown.Menu>
+                <Dropdown.Item text='Created At'></Dropdown.Item>
+                <Dropdown.Item text='Due Date'></Dropdown.Item>
+                <Dropdown.Item text='Name'></Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+          </Grid.Column>
+          <Grid.Column width={16}>
+            <Divider />
+          </Grid.Column>
+        </Grid.Row>
+      </Grid>
     )
   }
 
@@ -199,18 +222,17 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
               <Grid.Column width={9} verticalAlign="middle">
                 {this.renderName(todo)}
               </Grid.Column>
-              <Grid.Column width={3} floated="right">
+              <Grid.Column width={3} floated="right" verticalAlign="middle">
                 <p>Due: {todo.dueDate}</p>
-
               </Grid.Column>
-              <Grid.Column width={1} floated="right">
+              <Grid.Column width={1} floated="right" verticalAlign="middle">
                 <Rating
                   icon="star"
                   onRate={() => this.onTodoCheck(pos, true)}
                   rating={todo.important ? 1 : 0}
                 />
               </Grid.Column>
-              <Grid.Column width={1} floated="right">
+              <Grid.Column width={1} floated="right" verticalAlign="middle">
                 <Button
                   icon
                   color="blue"
@@ -219,7 +241,7 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
                   <Icon name="pencil" />
                 </Button>
               </Grid.Column>
-              <Grid.Column width={1} floated="right">
+              <Grid.Column width={1} floated="right" verticalAlign="middle">
                 <Button
                   icon
                   color="red"
