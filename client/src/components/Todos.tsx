@@ -14,7 +14,8 @@ import {
   Loader,
   Rating,
   GridRow,
-  Dropdown
+  Dropdown,
+  Container
 } from 'semantic-ui-react'
 
 import { createTodo, deleteTodo, getTodos, patchTodo } from '../api/todos-api'
@@ -72,7 +73,7 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
     }
   }
 
-  onTodoCheck = async (pos: number, isImportant: boolean = false) => {
+  onTodoCheck = async (pos: number, isImportant: boolean = false, isDueDate: number = -1) => {
     try {
       const todo = this.state.todos[pos]
       let updateValues
@@ -89,6 +90,15 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
           important: todo.important
         }
         posValue = { done: { $set: !todo.done } }
+      }
+      if (isDueDate != -1) {
+        const newDueDate = this.calculateDueDate(isDueDate)
+        updateValues = {
+          done: todo.done,
+          important: todo.important,
+          dueDate: newDueDate
+        }
+        posValue = { dueDate: { $set: newDueDate } }
       }
       await patchTodo(this.props.auth.getIdToken(), todo.todoId, {
         name: todo.name,
@@ -204,16 +214,27 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
     }
   }
 
-  renderDueDate(todo: Todo) {
-    if (todo.dueDate) {
-      return (
-        <p><Icon name="calendar alternate outline" /> Due: {todo.dueDate}</p>
-      )
-    } else {
-      return (
-        <p></p>
-      )
+  renderDueDate(todo: Todo, pos: number) {
+    let text = "Due: " + todo.dueDate
+    if (!todo.dueDate) {
+      text = '+ Add due date'
     }
+    return (
+      <Container>
+        <Icon name="calendar alternate outline" color="blue" />
+        <Dropdown
+          text={text}
+        >
+          <Dropdown.Menu>
+            <Dropdown.Item icon='circle' text='Today' onClick={() => this.onTodoCheck(pos, false, 0)}></Dropdown.Item>
+            <Dropdown.Item icon='chevron right' text='Tomorrow' onClick={() => this.onTodoCheck(pos, false, 1)}></Dropdown.Item>
+            <Dropdown.Item icon='angle double right' text='Next Week' onClick={() => this.onTodoCheck(pos, false, 7)}></Dropdown.Item>
+            <Dropdown.Item icon='delete calendar' text='Delete due date'></Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
+      </Container>
+    )
+
   }
 
   renderTodosList() {
@@ -232,7 +253,7 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
                 {this.renderName(todo)}
               </Grid.Column>
               <Grid.Column width={3} floated="right" verticalAlign="middle">
-                {this.renderDueDate(todo)}
+                {this.renderDueDate(todo, pos)}
               </Grid.Column>
               <Grid.Column width={1} floated="right" verticalAlign="middle">
                 <Rating
@@ -272,10 +293,10 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
     )
   }
 
-  // calculateDueDate(): string {
-  //   const date = new Date()
-  //   date.setDate(date.getDate() + 7)
+  calculateDueDate(days: number): string {
+    const date = new Date()
+    date.setDate(date.getDate() + days)
 
-  //   return dateFormat(date, 'yyyy-mm-dd') as string
-  // }
+    return dateFormat(date, 'yyyy-mm-dd') as string
+  }
 }
