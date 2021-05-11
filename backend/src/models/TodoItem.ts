@@ -6,5 +6,5 @@ export interface TodoItem {
   dueDate?: string
   done: boolean
   important: boolean
-  attachments?: { [key: string]: string }
+  attachments?: { [key: string]: { [key: string]: string } }
 }

@@ -16,3 +16,10 @@ export function getUploadUrl(attachId: string) {
         Expires: parseInt(urlExpiration)
     })
 }
+
+export function deleteFile(attachId: string) {
+    return s3.deleteObject({
+        Bucket: bucketName,
+        Key: attachId
+    })
+}

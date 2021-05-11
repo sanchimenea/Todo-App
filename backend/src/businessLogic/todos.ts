@@ -90,3 +90,35 @@ export async function addUrlTodo(userId: string, todoId: string, attachId: strin
     };
     return await todosAccess.updateTodo(params)
 }
+
+export async function deleteAttachment(attachId: string, todoId: string, userId: string) {
+    const todo = (await getTodoById(userId, todoId)).Item
+    let todoAttachments = todo.attachments
+
+    delete todoAttachments[attachId]
+    let params: TodoUpdateParams;
+
+    if (Object.keys(todoAttachments).length > 0) {
+        params = {
+            Key: {
+                "userId": userId,
+                "todoId": todoId
+            },
+            UpdateExpression: "set attachments = :attachments",
+            ExpressionAttributeValues: {
+                ":attachments": todoAttachments
+            }
+        };
+    }
+    else {
+        params = {
+            Key: {
+                "userId": userId,
+                "todoId": todoId
+            },
+            UpdateExpression: "remove attachments",
+        }
+    }
+
+    return await todosAccess.updateTodo(params)
+}
