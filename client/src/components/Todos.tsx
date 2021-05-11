@@ -73,14 +73,22 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
     }
   }
 
-  onAttachDelete = async (attachId: string, todoId: string) => {
+  onAttachDelete = async (attachId: string, todoId: string, pos: number) => {
     try {
       console.log("Delete", attachId, todoId)
 
       await deleteAttach(this.props.auth.getIdToken(), todoId, attachId)
-      // this.setState({
-      //   todos: this.state.todos.filter(todo => todo.todoId != todoId)
-      // })
+      const todo = this.state.todos[pos]
+      const attachments = todo.attachments
+      if (attachments) {
+        delete attachments[attachId]
+      }
+      this.setState({
+        todos: update(this.state.todos, {
+          [pos]: { attachments: { $set: attachments } }
+        })
+      })
+      this.forceUpdate()
     } catch {
       alert('Attach deletion failed')
     }
@@ -271,23 +279,24 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
     }
   }
 
-  renderAttachments(todo: Todo) {
+  renderAttachments(todo: Todo, pos: number) {
+
     if (!todo.attachments) {
       return
     }
     else {
       const attachArray = Object.entries(todo.attachments)
       return (
-        attachArray.map((attach, pos) => {
+        attachArray.map((attach, idx) => {
           return (
-            <Grid.Column width={16} style={{ marginBottom: "2px" }}>
+            <Grid.Column key={attach[0]} width={16} style={{ marginBottom: "2px" }}>
               <a href={attach[1].attachmentUrl} style={{ marginRight: "15px" }}>{attach[1].name}</a>
               <Button
                 icon
                 compact inverted
                 color="red"
                 size="mini"
-                onClick={() => this.onAttachDelete(attach[0], todo.todoId)}
+                onClick={() => this.onAttachDelete(attach[0], todo.todoId, pos)}
               >
                 <Icon name="delete" />
               </Button>
@@ -342,7 +351,8 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
                   <Icon name="delete" />
                 </Button>
               </Grid.Column>
-              {this.renderAttachments(todo)}
+
+              {this.renderAttachments(todo, pos)}
               <Grid.Column width={16}>
                 <Divider />
               </Grid.Column>
