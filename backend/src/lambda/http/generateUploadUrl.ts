@@ -38,7 +38,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
   const signedUrl = getUploadUrl(attachId)
   const bucketURL = `https://${bucketName}.s3.amazonaws.com/`
 
-  await addUrlTodo(todoId, attachId, bucketURL, newAttach)
+  await addUrlTodo(userId, todoId, attachId, bucketURL, newAttach)
 
   // logger.info('Added attachment with URL: ' + attachmentUrl)
 

@@ -63,16 +63,30 @@ export async function updateTodo(updatedTodo: UpdateTodoRequest, todoId: string,
     return await todosAccess.updateTodo(params)
 }
 
-export async function addUrlTodo(todoId: string, attachId: string, bucketURL: string, newAttach: CreateAttachRequest) {
+export async function addUrlTodo(userId: string, todoId: string, attachId: string, bucketURL: string, newAttach: CreateAttachRequest) {
     // Add attachment URL to Attachment's Table 1:M todoId:attachId
 
     const attachmentUrl = new URL(attachId, bucketURL)
-    const newItem = await todosAccess.createAttach({
-        todoId,
-        attachId,
+    let todo = (await getTodoById(userId, todoId)).Item
+
+    if (!("attachments" in todo)) {
+        todo["attachments"] = {}
+    }
+
+    todo.attachments[attachId] = {
         attachmentUrl: attachmentUrl.toString(),
         ...newAttach
-    })
+    }
 
-    return newItem
+    const params: TodoUpdateParams = {
+        Key: {
+            "userId": userId,
+            "todoId": todoId
+        },
+        UpdateExpression: "set attachments = :attachments",
+        ExpressionAttributeValues: {
+            ":attachments": todo.attachments
+        }
+    };
+    return await todosAccess.updateTodo(params)
 }
