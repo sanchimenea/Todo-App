@@ -38,6 +38,10 @@ export async function todoExists(todoId: string, userId: string) {
     return await todosAccess.todoExists(todoId, userId)
 }
 
+export async function getTodoById(userId: string, todoId: string) {
+    return await todosAccess.getTodoById(userId, todoId)
+}
+
 export async function deleteTodo(todoId: string, userId: string) {
     return await todosAccess.deleteTodo(todoId, userId)
 

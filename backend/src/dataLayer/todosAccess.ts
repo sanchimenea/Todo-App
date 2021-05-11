@@ -40,6 +40,18 @@ export class TodoAccess {
         return newItem
     }
 
+    async getTodoById(userId: string, todoId: string) {
+        const result = await this.docClient
+            .get({
+                TableName: this.todosTable,
+                Key: {
+                    todoId: todoId,
+                    userId: userId
+                }
+            }).promise()
+        return result
+    }
+
     async todoExists(todoId: string, userId: string) {
         const result = await this.docClient
             .get({
