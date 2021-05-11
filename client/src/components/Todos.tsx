@@ -18,7 +18,7 @@ import {
   Container
 } from 'semantic-ui-react'
 
-import { createTodo, deleteTodo, getTodos, patchTodo } from '../api/todos-api'
+import { createTodo, deleteAttach, deleteTodo, getTodos, patchTodo } from '../api/todos-api'
 import Auth from '../auth/Auth'
 import { Todo } from '../types/Todo'
 
@@ -70,6 +70,19 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
       })
     } catch {
       alert('Todo deletion failed')
+    }
+  }
+
+  onAttachDelete = async (attachId: string, todoId: string) => {
+    try {
+      console.log("Delete", attachId, todoId)
+
+      await deleteAttach(this.props.auth.getIdToken(), todoId, attachId)
+      // this.setState({
+      //   todos: this.state.todos.filter(todo => todo.todoId != todoId)
+      // })
+    } catch {
+      alert('Attach deletion failed')
     }
   }
 
@@ -258,6 +271,34 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
     }
   }
 
+  renderAttachments(todo: Todo) {
+    if (!todo.attachments) {
+      return
+    }
+    else {
+      const attachArray = Object.entries(todo.attachments)
+      return (
+        attachArray.map((attach, pos) => {
+          return (
+            <Grid.Column width={16} style={{ marginBottom: "2px" }}>
+              <a href={attach[1].attachmentUrl} style={{ marginRight: "15px" }}>{attach[1].name}</a>
+              <Button
+                icon
+                compact inverted
+                color="red"
+                size="mini"
+                onClick={() => this.onAttachDelete(attach[0], todo.todoId)}
+              >
+                <Icon name="delete" />
+              </Button>
+            </Grid.Column>
+          )
+        })
+      )
+    }
+  }
+
+
   renderTodosList() {
     return (
       <Grid padded>
@@ -301,9 +342,7 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
                   <Icon name="delete" />
                 </Button>
               </Grid.Column>
-              {todo.attachmentUrl && (
-                <Image src={todo.attachmentUrl} size="small" wrapped />
-              )}
+              {this.renderAttachments(todo)}
               <Grid.Column width={16}>
                 <Divider />
               </Grid.Column>

@@ -6,4 +6,5 @@ export interface Todo {
   done: boolean
   important: boolean
   attachmentUrl?: string
+  attachments?: { [key: string]: { [key: string]: string } }
 }
