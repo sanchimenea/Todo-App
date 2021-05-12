@@ -1,5 +1,4 @@
 import * as uuid from 'uuid'
-import dateFormat from 'dateformat'
 import { TodoItem } from '../models/TodoItem'
 import { TodoAccess } from '../dataLayer/todosAccess'
 import { CreateTodoRequest } from '../requests/CreateTodoRequest'
@@ -18,7 +17,7 @@ export async function getTodosByUser(userId: string): Promise<TodoItem[]> {
 
 export async function createTodo(userId: string, newTodo: CreateTodoRequest) {
     const todoId = uuid.v4()
-    const createdAt = dateFormat(new Date(), 'yyyy-mm-dd') as string
+    const createdAt = new Date().toISOString()
 
     const newItem = await todosAccess.createTodo({
         userId,

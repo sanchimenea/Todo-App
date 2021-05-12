@@ -198,9 +198,10 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
               className='icon'
             >
               <Dropdown.Menu>
-                <Dropdown.Item text='Created At'></Dropdown.Item>
-                <Dropdown.Item text='Due Date'></Dropdown.Item>
-                <Dropdown.Item text='Name'></Dropdown.Item>
+                <Dropdown.Header content="Created At" />
+                <Dropdown.Divider />
+                <Dropdown.Item text='Ascending' onClick={() => { this.sortCreatedAt() }}></Dropdown.Item>
+                <Dropdown.Item text='Descending' onClick={() => { this.sortCreatedAt(true) }}></Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
           </Grid.Column>
@@ -210,6 +211,26 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
         </Grid.Row>
       </Grid>
     )
+  }
+
+  sortCreatedAt(descending = false) {
+    if (descending) {
+      this.setState({
+        todos: this.state.todos.slice().sort((a, b) => {
+          return new Date(a.createdAt).getTime() -
+            new Date(b.createdAt).getTime()
+        }).reverse()
+      })
+    }
+    else {
+      this.setState({
+        todos: this.state.todos.slice().sort((a, b) => {
+          return new Date(a.createdAt).getTime() -
+            new Date(b.createdAt).getTime()
+        })
+      })
+    }
+
   }
 
   renderTodos() {
@@ -306,6 +327,7 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
       )
     }
   }
+
 
 
   renderTodosList() {
