@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "d0700d24-79ec-487e-8403-b565bef7f8e0",
+		"_postman_id": "1495d258-82b3-409b-8efa-2e6f586b1f75",
 		"name": "Todo App",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -19,10 +19,6 @@
 								"type": "text"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "https://{{apiId}}.execute-api.us-east-2.amazonaws.com/dev/todos",
 							"protocol": "https",
@@ -36,6 +32,36 @@
 							"path": [
 								"dev",
 								"todos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get todo by Id",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "https://{{apiId}}.execute-api.us-east-2.amazonaws.com/dev/todos/36a73668-2b94-4301-bd47-53d2600a9cc4",
+							"protocol": "https",
+							"host": [
+								"{{apiId}}",
+								"execute-api",
+								"us-east-2",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"dev",
+								"todos",
+								"36a73668-2b94-4301-bd47-53d2600a9cc4"
 							]
 						}
 					},
@@ -60,7 +86,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"name\": \"Water flowers\",\n\t\"dueDate\": \"2019-06-11\"\n}"
+							"raw": "{\n\t\"name\": \"Water flowers\"\n}"
 						},
 						"url": {
 							"raw": "https://{{apiId}}.execute-api.us-east-2.amazonaws.com/dev/todos",
@@ -83,7 +109,7 @@
 				{
 					"name": "Update todo",
 					"request": {
-						"method": "PUT",
+						"method": "PATCH",
 						"header": [
 							{
 								"key": "Content-Type",
@@ -99,10 +125,10 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"name\": \"Change the world\",\n\t\"dueDate\": \"2019-12-11\",\n\t\"done\": true\n}"
+							"raw": "{\n\t\"name\": \"Change the world\",\n\t\"dueDate\": \"2021-11-11\",\n\t\"done\": true,\n    \"important\": true\n}"
 						},
 						"url": {
-							"raw": "https://{{apiId}}.execute-api.us-east-2.amazonaws.com/dev/todos/35dd600f-43c2-4649-903c-615e1586a26f",
+							"raw": "https://{{apiId}}.execute-api.us-east-2.amazonaws.com/dev/todos/da1357d4-2133-4ed3-8d60-189d68e8f0c2",
 							"protocol": "https",
 							"host": [
 								"{{apiId}}",
@@ -114,7 +140,7 @@
 							"path": [
 								"dev",
 								"todos",
-								"35dd600f-43c2-4649-903c-615e1586a26f"
+								"da1357d4-2133-4ed3-8d60-189d68e8f0c2"
 							]
 						}
 					},
@@ -142,7 +168,7 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "https://{{apiId}}.execute-api.us-east-2.amazonaws.com/dev/todos/fe671583-4512-45f6-9475-4265c04362fb",
+							"raw": "https://{{apiId}}.execute-api.us-east-2.amazonaws.com/dev/todos/ec52c0a6-3904-4862-830f-28c260d3edcc",
 							"protocol": "https",
 							"host": [
 								"{{apiId}}",
@@ -154,7 +180,7 @@
 							"path": [
 								"dev",
 								"todos",
-								"fe671583-4512-45f6-9475-4265c04362fb"
+								"ec52c0a6-3904-4862-830f-28c260d3edcc"
 							]
 						}
 					},
@@ -173,10 +199,15 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "{\n    \"name\": \"test123.png\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
 						"url": {
-							"raw": "https://{{apiId}}.execute-api.us-east-2.amazonaws.com/dev/todos/3836b777-9bc4-4429-9b79-ba4e4f5f91c0/attachment",
+							"raw": "https://{{apiId}}.execute-api.us-east-2.amazonaws.com/dev/todos/36a73668-2b94-4301-bd47-53d2600a9cc4/attachment",
 							"protocol": "https",
 							"host": [
 								"{{apiId}}",
@@ -188,8 +219,49 @@
 							"path": [
 								"dev",
 								"todos",
-								"3836b777-9bc4-4429-9b79-ba4e4f5f91c0",
+								"36a73668-2b94-4301-bd47-53d2600a9cc4",
 								"attachment"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete attachment of Todo",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"test123.png\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{apiId}}.execute-api.us-east-2.amazonaws.com/dev/todos/d8a3fc43-c15a-46af-b6df-1fbab9a34a90/attachment/096bf946-9e50-445b-83e8-d11d51b712df.png",
+							"protocol": "https",
+							"host": [
+								"{{apiId}}",
+								"execute-api",
+								"us-east-2",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"dev",
+								"todos",
+								"d8a3fc43-c15a-46af-b6df-1fbab9a34a90",
+								"attachment",
+								"096bf946-9e50-445b-83e8-d11d51b712df.png"
 							]
 						}
 					},
@@ -200,7 +272,6 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "ce2b42d4-8cc5-4f30-a6ed-e7f0f303c3fd",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -210,7 +281,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "efb16c49-3866-4241-97d1-360ad72736d8",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -224,7 +294,6 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "2e83c0fe-6650-44d5-a90f-4c27ff720d83",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -234,7 +303,6 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "977c227e-2df3-42eb-9a48-ec25e2f7eeae",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -244,16 +312,12 @@
 	],
 	"variable": [
 		{
-			"id": "bf208e6b-f66d-4008-9366-dd541ff65425",
 			"key": "apiId",
-			"value": "",
-			"type": "string"
+			"value": "bjr2pn2mn1"
 		},
 		{
-			"id": "9bc6399a-d2bb-4f2d-9ffa-8480370d383c",
 			"key": "authToken",
-			"value": "",
-			"type": "string"
+			"value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IlpVSG9PTWY1M0xSWG82NXFxeTlXVSJ9.eyJpc3MiOiJodHRwczovL2Rldi1rMzU2eWt5MS51cy5hdXRoMC5jb20vIiwic3ViIjoiZ29vZ2xlLW9hdXRoMnwxMTgxMTA1NDg5NjY5Mjg1Nzc1NzIiLCJhdWQiOiJGSzNsOU5md0FCT3k3alBYeHp3cnFXd0xyMHpJSjIybCIsImlhdCI6MTYyMDc2NzI5MSwiZXhwIjoxNjIwODAzMjkxLCJhdF9oYXNoIjoiQndXeC01b3hwa3g3NW1tNXJHbTFRdyIsIm5vbmNlIjoiLW1PfmhqbGg2SmktYjA2aG4ueXgtVHR3WVA5QkVLVWoifQ.heAhbv41HhOEWcvmOJzcmYsRNHGMNT2QOhXTRJq8VZiiRhUh0i3ZszVzrhDAkJk2yG2yo553JQl8bZ6oa3PJuQOEo4_Oil0AVONAAdp1e1YvmBXqf9FNQreYuyEY9wXLA-rjPBhBvN1LnTnVaV2oSzRy5Xxvkqa22mPyezFrkHRcM6PGWB2r9ZkR0PzQ5YrF7BwyBhlaUAbzhiKGnSWP5-OUp1GebISOhvBTamdi6K2HTNYWy6YOQUtMkPbyCyYoKr0jIrVMLohuTv8ECJwBRgUZL-VyVEmbz0yFoRSYlLATtLodCy9Pe8n87AWBxZb6VKdjdjSnRXWIxS9LwY8Abg"
 		}
 	]
 }
